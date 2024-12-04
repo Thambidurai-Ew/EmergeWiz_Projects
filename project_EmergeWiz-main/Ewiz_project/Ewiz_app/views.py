@@ -105,7 +105,6 @@ def add_job_openings_view(request):
         description = request.POST.get("description", "").strip()
         key_Skills = request.POST.getlist("key_Skills[]")
         
-        print(key_Skills)
         
         if not key_Skills or not all(skill.strip() for skill in key_Skills):
             context = {
@@ -124,7 +123,6 @@ def add_job_openings_view(request):
             'key_skills': key_Skills,
         }
         
-        print(jobs_data)
 
         # Get the token
         try:
@@ -145,7 +143,6 @@ def add_job_openings_view(request):
             response = requests.post(api_url, json=jobs_data, headers=headers)
             response_data = response.json()
             
-            print(response_data)
             
         except requests.exceptions.HTTPError as http_err:
             # Handle specific HTTP errors
