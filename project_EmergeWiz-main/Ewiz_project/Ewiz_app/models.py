@@ -60,6 +60,7 @@ class JobOpenings(models.Model):
     key_skills = models.JSONField(blank=True, null=True)
     location = models.CharField(max_length=150)
     experience = models.CharField(max_length=150)
+    Job_Openings = models.CharField(max_length=150, null=True, blank=True)
     salary = models.CharField(max_length=150)
     status = models.BooleanField(blank=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)

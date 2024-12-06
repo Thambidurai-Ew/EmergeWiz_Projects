@@ -109,6 +109,20 @@
                                 </div>
                             </div>
 
+                            <!-- Job Openings -->
+                            <div class="col-12 col-md-6 pe-md-0">
+                                <div class="user-input-wrp me-md-2">
+                                    <input type="text" name="Job_Openings" id="Job_Openings" class="form-control"
+                                        placeholder=" " autocomplete="off" autofocus>
+                                    <label class="floating-label">&nbsp;Job Openings&nbsp;</label>
+                                    <span id="Job_Openings_error" class="error-div">
+                                        {% if errors.Job_Openings %}
+                                            {{errors.Job_Openings}}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
                             <!-- Description Field -->
                             <div class="col-12 col-md-6">
                                 <div class="user-input-wrp me-md-2">
@@ -128,8 +142,8 @@
                                             placeholder=" " autocomplete="off" autofocus>
                                         <label class="floating-label">&nbsp;Key Skills&nbsp;</label>
                                         <span id="key_Skills_error" class="error-div">
-                                            {% if errors.location %}
-                                                {{ errors.location }}
+                                            {% if errors.key_Skills %}
+                                                {{ errors.key_Skills }}
                                             {% endif %}
                                         </span>
                                     </div>

@@ -102,6 +102,7 @@ def add_job_openings_view(request):
         location = request.POST.get("location", "").strip()
         experience = request.POST.get("experience", "").strip()
         salary = request.POST.get("salary", "").strip()
+        Job_Openings = request.POST.get("Job_Openings", "").strip()
         description = request.POST.get("description", "").strip()
         key_Skills = request.POST.getlist("key_Skills[]")
         
@@ -119,6 +120,7 @@ def add_job_openings_view(request):
             'location': location,
             'experience': experience,
             'salary': salary,
+            'Job_Openings': Job_Openings,
             'description': description,
             'key_skills': key_Skills,
         }
