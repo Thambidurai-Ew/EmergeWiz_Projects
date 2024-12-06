@@ -132,7 +132,10 @@
                                         <th class="thead">Location</th>
                                         <th class="thead">Experience</th>
                                         <th class="thead">Salary</th>
+                                        <th class="thead">Job Openings</th>
+                                        <th class="thead">Key Skills</th>
                                         <th class="thead">Description</th>
+
                                         <th class="thead">Status</th>
                                         <th class="action">Action</th>
                                     </tr>
@@ -146,11 +149,22 @@
                                         <td class="tdata">{{ user.location }}</td>
                                         <td class="tdata">{{ user.experience }}</td>
                                         <td class="tdata">{{ user.salary }}</td>
+                                        <td class="tdata">{{ user.Job_Openings }}</td>
+
+                                        <td class="tdata">
+                                            <ul>
+                                                {% for skill in user.key_skills %}
+                                                    <li>{{ skill }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+
                                         <td class="tdata status">
                                             <div class="status-div">
                                                 <div class="status-display">{{ user.description }}</div>
                                             </div>
                                         </td>
+
                                         <td class="tdata">
                                             <div class="toggle-switch">
                                                 <input type="checkbox" id="statusToggle-{{ user.id }}" class="toggle-input" {% if job_opening.status %}checked{% endif %}>

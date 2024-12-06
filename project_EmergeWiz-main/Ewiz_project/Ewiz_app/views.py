@@ -185,7 +185,6 @@ def manage_job_openings_view(request):
     
     api_url = f'{base_url}/api/job_openings/'
     headers = {
-        'Authorization': f'Token {token.key}',
         'Content-Type': 'application/json'
     }
 
@@ -224,17 +223,19 @@ def delete_job_openings_view(request, id):
         context = {'error': 'ID not provided'}
         return render(request, 'Ewiz_app/manage_jobs.html', context)
     
-    try:
-        token = Token.objects.first()  # Get the first token for simplicity
-        if not token:
-            raise Token.DoesNotExist
-    except Token.DoesNotExist:
-        context = {'error': 'Authentication token not found'}
-        return render(request, 'Ewiz_app/manage_jobs.html', context)
+    print("test")
+    
+    # try:
+    #     token = Token.objects.first()  # Get the first token for simplicity
+    #     if not token:
+    #         raise Token.DoesNotExist
+    # except Token.DoesNotExist:
+    #     context = {'error': 'Authentication token not found'}
+    #     return render(request, 'Ewiz_app/manage_jobs.html', context)
     
     api_url = f'{base_url}/api/delete_job_openings/{user_id.pk}/'
     headers = {
-        'Authorization': f'Token {token.key}',
+        
         'Content-Type': 'application/json'
     }
     
@@ -278,25 +279,38 @@ def update_job_openings_view(request, id):
 
     if request.method == 'POST':
         
-        try:
-            token = Token.objects.first()  # Get the first token for simplicity
-            if not token:
-                raise Token.DoesNotExist
-        except Token.DoesNotExist:
-            context = {'error': 'Authentication token not found'}
-            return render(request, 'Ewiz_app/manage_jobs.html', context)
+        
+        # try:
+        #     token = Token.objects.first()  # Get the first token for simplicity
+        #     if not token:
+        #         raise Token.DoesNotExist
+        # except Token.DoesNotExist:
+        #     context = {'error': 'Authentication token not found'}
+        #     return render(request, 'Ewiz_app/manage_jobs.html', context)
         
         api_url = f'{base_url}/api/update_job_openings/{jobs.pk}/'
         headers = {
-            'Authorization': f'Token {token.key}',
             'Content-Type': 'application/json'
         }
+        
+        # Get form data
+        key_skills = request.POST.getlist("key_Skills[]", jobs.key_skills)
+        
+        # Validate key_skills
+        if not key_skills or any(not skill.strip() for skill in key_skills):
+            context = {
+                'error': 'Key Skills cannot be empty',
+                'data': jobs,
+            }
+            return render(request, 'Ewiz_app/update_jobs.html', context)
         
         user_data = {
             'job_title' : request.POST.get("job_title", jobs.job_title),
             'location' : request.POST.get("location", jobs.location), 
             'experience' : request.POST.get("experience", jobs.experience),
             'salary' : request.POST.get("salary", jobs.salary),
+            'Job_Openings' : request.POST.get("Job_Openings", jobs.Job_Openings),
+            'key_skills' : key_skills,
             'description' : request.POST.get("description", jobs.description),
         }
 
@@ -311,7 +325,7 @@ def update_job_openings_view(request, id):
             }
             return render(request, 'Ewiz_app/manage_jobs.html', context)
         
-        if response.status_code in [200, 204]:  # 204 No Content is also a valid response for updates
+        if response.status_code == 200:  # 204 No Content is also a valid response for updates
             return redirect('manage_job_openings')
         else:
             context = {

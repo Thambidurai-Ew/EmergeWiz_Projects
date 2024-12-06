@@ -95,6 +95,20 @@
                                 </div>
                             </div>
 
+                            <!-- Job Openings -->
+                            <div class="col-12 col-md-6 pe-md-0">
+                                <div class="user-input-wrp me-md-2">
+                                    <input type="text" name="Job_Openings" id="Job_Openings" value="{{data.Job_Openings}}" class="form-control"
+                                        placeholder=" " autocomplete="off" autofocus>
+                                    <label class="floating-label">&nbsp;Job Openings&nbsp;</label>
+                                    <span id="Job_Openings_error" class="error-div">
+                                        {% if errors.Job_Openings %}
+                                            {{errors.Job_Openings}}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
                             <!-- Description Field -->
                             <div class="col-12 col-md-6">
                                 <div class="user-input-wrp me-md-2">
@@ -106,7 +120,50 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <!-- Key Skills
+                            <div id="key-skills-container">
+                                <div class="col-12 col-md-6 pe-md-0" id="key-skills-field">
+                                    <div class="user-input-wrp me-md-2">
+                                        <input type="text" name="key_Skills[]" id="key_Skills" value="{{data.key_Skills}}" class="form-control"
+                                            placeholder=" " autocomplete="off" autofocus>
+                                        <label class="floating-label">&nbsp;Key Skills&nbsp;</label>
+                                        <span id="key_Skills_error" class="error-div">
+                                            {% if errors.key_Skills %}
+                                                {{ errors.key_Skills }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                            <!-- Key Skills -->
+                            <div id="key-skills-container">
+                                {% for skill in data.key_skills %}
+                                <div class="key-skill-item row mb-2">
+                                    <div class="col-10">
+                                        <input type="text" name="key_Skills[]" value="{{ skill }}" class="form-control" placeholder="Key Skill">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-danger remove-skill">Remove</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <!-- Empty field for adding new skills -->
+                                <div class="key-skill-item row mb-2">
+                                    <div class="col-10">
+                                        <input type="text" name="key_Skills[]" class="form-control" placeholder="Key Skill">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-danger remove-skill">Remove</button>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-skill" class="btn btn-primary mt-2">Add Skill</button>
+                            </div>
                         </div>
+                         <!-- Buttons to Add/Remove -->
+                         <!-- <div class="p-2 bg-success text-white add-btn" id="add-field-btn" onclick="addKeySkillsField()">+</div>
+                         <div class="p-2 bg-danger text-white rm-btn" id="remove-field-btn" onclick="removeKeySkillsField()">-</div> -->
 
                         <div class="row d-flex justify-content-between my-3">
                             <div class="col-6 d-flex justify-content-md-end p-0 pe-4 pe-lg-4">
@@ -207,5 +264,68 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => showMessage());
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const skillsContainer = document.getElementById("key-skills-container");
+    const addSkillButton = document.getElementById("add-skill");
+
+    // Function to add a new skill input
+    addSkillButton.addEventListener("click", function () {
+        const skillItem = document.createElement("div");
+        skillItem.classList.add("key-skill-item", "row", "mb-2");
+        skillItem.innerHTML = `
+            <div class="col-10">
+                <input type="text" name="key_Skills[]" class="form-control" placeholder="Key Skill">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-danger remove-skill">Remove</button>
+            </div>
+        `;
+        skillsContainer.insertBefore(skillItem, addSkillButton);
+
+        // Attach event listener to the remove button of the new field
+        skillItem.querySelector(".remove-skill").addEventListener("click", function () {
+            skillItem.remove();
+        });
+    });
+
+    // Event delegation for removing skill items
+    skillsContainer.addEventListener("click", function (event) {
+        if (event.target.classList.contains("remove-skill")) {
+            const skillItem = event.target.closest(".key-skill-item");
+            skillItem.remove();
+        }
+    });
+});
+
+
+    // function addKeySkillsField() {
+    //     // Find the container
+    //     const container = document.getElementById('key-skills-container');
+
+    //     // Create a new div for the field
+    //     const newField = document.createElement('div');
+    //     newField.classList.add('col-12', 'col-md-6', 'pe-md-0');
+    //     newField.innerHTML = `
+    //         <div class="user-input-wrp me-md-2">
+    //             <input type="text" name="key_Skills[]" class="form-control" placeholder=" " autocomplete="off">
+    //             <label class="floating-label">&nbsp;Key Skills&nbsp;</label>
+    //             <span class="error-div"></span>
+    //         </div>
+    //     `;
+
+    //     // Append the new field to the container
+    //     container.appendChild(newField);
+    // }
+
+    // function removeKeySkillsField() {
+    //     // Find the container
+    //     const container = document.getElementById('key-skills-container');
+
+    //     // Remove the last field, if any
+    //     if (container.lastElementChild && container.childElementCount > 1) {
+    //         container.removeChild(container.lastElementChild);
+    //     }
+    // }
 </script>
 {% endblock %}
