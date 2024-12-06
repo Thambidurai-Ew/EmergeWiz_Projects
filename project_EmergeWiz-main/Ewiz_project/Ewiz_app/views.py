@@ -297,12 +297,12 @@ def update_job_openings_view(request, id):
         key_skills = request.POST.getlist("key_Skills[]", jobs.key_skills)
         
         # Validate key_skills
-        if not key_skills or any(not skill.strip() for skill in key_skills):
-            context = {
-                'error': 'Key Skills cannot be empty',
-                'data': jobs,
-            }
-            return render(request, 'Ewiz_app/update_jobs.html', context)
+        # if not key_skills or any(not skill.strip() for skill in key_skills):
+        #     context = {
+        #         'error': 'Key Skills cannot be empty',
+        #         'data': jobs,
+        #     }
+        #     return render(request, 'Ewiz_app/update_jobs.html', context)
         
         user_data = {
             'job_title' : request.POST.get("job_title", jobs.job_title),
