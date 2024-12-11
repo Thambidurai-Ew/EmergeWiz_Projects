@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     
@@ -36,3 +38,7 @@ urlpatterns = [
     path('api/update_job_openings/<int:pk>/', JobOpeningsUpdateView.as_view(), name='job_openings_update'),
     path('api/delete_job_openings/<int:pk>/', JobOpeningsDeleteView.as_view(), name='job_openings_delete'),
 ]
+
+if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL,
+                              document_root=settings.MEDIA_ROOT)

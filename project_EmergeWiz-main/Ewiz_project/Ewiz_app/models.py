@@ -63,6 +63,7 @@ class JobOpenings(models.Model):
     Job_Openings = models.CharField(max_length=150, null=True, blank=True)
     salary = models.CharField(max_length=150)
     status = models.BooleanField(blank=True, default=False)
+    logo = models.ImageField(upload_to='images/', default='images/logo-1.png', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_by = models.IntegerField(null=True, blank=True)

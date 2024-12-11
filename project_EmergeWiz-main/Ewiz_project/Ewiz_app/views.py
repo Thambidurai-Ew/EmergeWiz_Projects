@@ -16,6 +16,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # mail
 from django.core.mail import send_mail, EmailMessage
@@ -42,7 +43,7 @@ def admin_login(request):
                 'X-CSRFToken': csrf_token
             }
             response = requests.post(url, data=data, headers=headers)
-            # response.raise_for_status()  # Raise an HTTPError for bad responses
+            response.raise_for_status()  # Raise an HTTPError for bad responses
             response_data = response.json()
     
         except requests.exceptions.RequestException as e:
@@ -54,6 +55,8 @@ def admin_login(request):
         if response.status_code == 200:
             user = authenticate(request, email=email, password=password)
             if user is not None:
+                if not hasattr(user, 'backend'):
+                    user.backend = 'Ewiz_app.auth_backends.MultiModelBackend'
                 login(request, user)
                 return redirect('dashboard')
             else:
@@ -95,7 +98,7 @@ def dashboard_view(request):
 # Add job openings
 
 def add_job_openings_view(request):
-    print("welcome")
+    
     if request.method == 'POST':
         # Extract data from the form
         job_title = request.POST.get("job_title", "").strip()
@@ -105,6 +108,7 @@ def add_job_openings_view(request):
         Job_Openings = request.POST.get("Job_Openings", "").strip()
         description = request.POST.get("description", "").strip()
         key_Skills = request.POST.getlist("key_Skills[]")
+        logo = request.FILES.get("logo")
         
         
         if not key_Skills or not all(skill.strip() for skill in key_Skills):
@@ -122,29 +126,25 @@ def add_job_openings_view(request):
             'salary': salary,
             'Job_Openings': Job_Openings,
             'description': description,
-            'key_skills': key_Skills,
+            'key_skills': json.dumps(key_Skills),
         }
         
+        files = {
+            'logo': logo,
+            'data': (None, json.dumps(jobs_data), 'application/json'),
+        }
 
-        # Get the token
-        try:
-            token = Token.objects.first()
-        except Token.DoesNotExist:
-            context = {
-                'error': 'Authentication token not found'
-            }
-            return render(request, 'add_jobs.html', context)
+        print(files)
         
         api_url = f'{base_url}/api/job_openings/'
-        headers = {
-            # 'Authorization': f'Token {token.key}',
-            'Content-Type': 'application/json'
-        }
+        # headers = {
+        #     # 'Authorization': f'Token {token.key}',
+        #     # 'Content-Type': 'application/json'
+        # }
 
         try:
-            response = requests.post(api_url, json=jobs_data, headers=headers)
+            response = requests.post(api_url, data=jobs_data, files=files)
             response_data = response.json()
-            
             
         except requests.exceptions.HTTPError as http_err:
             # Handle specific HTTP errors
@@ -174,15 +174,7 @@ def add_job_openings_view(request):
     return render(request, 'Ewiz_app/add_jobs.html')
 
 def manage_job_openings_view(request):
-    # Fetch the token
-    try:
-        token = Token.objects.first()  # Assuming you only have one token and it's safe to get the first one
-    except Token.DoesNotExist:
-        context = {
-            'error': 'Authentication token not found'
-        }
-        return render(request, 'Ewiz_app/manage_jobs.html', context)
-    
+
     api_url = f'{base_url}/api/job_openings/'
     headers = {
         'Content-Type': 'application/json'
@@ -222,16 +214,6 @@ def delete_job_openings_view(request, id):
     if not user_id:
         context = {'error': 'ID not provided'}
         return render(request, 'Ewiz_app/manage_jobs.html', context)
-    
-    print("test")
-    
-    # try:
-    #     token = Token.objects.first()  # Get the first token for simplicity
-    #     if not token:
-    #         raise Token.DoesNotExist
-    # except Token.DoesNotExist:
-    #     context = {'error': 'Authentication token not found'}
-    #     return render(request, 'Ewiz_app/manage_jobs.html', context)
     
     api_url = f'{base_url}/api/delete_job_openings/{user_id.pk}/'
     headers = {
@@ -279,30 +261,13 @@ def update_job_openings_view(request, id):
 
     if request.method == 'POST':
         
-        
-        # try:
-        #     token = Token.objects.first()  # Get the first token for simplicity
-        #     if not token:
-        #         raise Token.DoesNotExist
-        # except Token.DoesNotExist:
-        #     context = {'error': 'Authentication token not found'}
-        #     return render(request, 'Ewiz_app/manage_jobs.html', context)
-        
         api_url = f'{base_url}/api/update_job_openings/{jobs.pk}/'
-        headers = {
-            'Content-Type': 'application/json'
-        }
+        # headers = {
+        #     'Content-Type': 'application/json'
+        # }
         
         # Get form data
         key_skills = request.POST.getlist("key_Skills[]", jobs.key_skills)
-        
-        # Validate key_skills
-        # if not key_skills or any(not skill.strip() for skill in key_skills):
-        #     context = {
-        #         'error': 'Key Skills cannot be empty',
-        #         'data': jobs,
-        #     }
-        #     return render(request, 'Ewiz_app/update_jobs.html', context)
         
         user_data = {
             'job_title' : request.POST.get("job_title", jobs.job_title),
@@ -310,14 +275,34 @@ def update_job_openings_view(request, id):
             'experience' : request.POST.get("experience", jobs.experience),
             'salary' : request.POST.get("salary", jobs.salary),
             'Job_Openings' : request.POST.get("Job_Openings", jobs.Job_Openings),
-            'key_skills' : key_skills,
+            'key_skills' : json.dumps(key_skills),
             'description' : request.POST.get("description", jobs.description),
+            
         }
+        
+        # Handle file upload (if any)
+        logo_file = request.FILES.get("logo")
+        
+        print(f"Logo file: {logo_file}")
+
+        # Prepare the files dictionary for sending the file in the request
+        files = {}
+        if logo_file:
+            files['logo'] = logo_file
+        
+        # files = {
+        #     'logo' : request.FILES.get("logo", jobs.logo),
+        #     'data': (None, json.dumps(user_data), 'application/json'),
+        # }
+        
+        print(files)
 
         try:
-            response = requests.patch(api_url, json=user_data, headers=headers)
+            response = requests.patch(api_url, data=user_data, files=files)
             response.raise_for_status()
             response_data = response.json()
+            print(response_data)
+
         except requests.exceptions.RequestException as err:
             context = {
                 'error': f'Request error occurred: {err}',
@@ -430,17 +415,13 @@ def user_logout(request):
 class JobOpeningsListCreateView(generics.ListCreateAPIView):
     queryset = JobOpenings.objects.all().order_by('-id')
     serializer_class = JobOpeningsSerializer
+    parser_classes = [MultiPartParser, FormParser]  # Allows multipart form data (files + form data)
     
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         if not queryset.exists():
             return Response({'Message': 'No users found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Ensure that key_skills is not None in the response
-        # for job in serializer.data:
-        #     if 'key_skills' not in job or job['key_skills'] is None:
-        #         job['key_skills'] = []
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -453,6 +434,7 @@ class JobOpeningsDetailView(generics.RetrieveUpdateDestroyAPIView):
 class JobOpeningsUpdateView(generics.RetrieveUpdateAPIView):
     queryset = JobOpenings.objects.all()
     serializer_class = JobOpeningsSerializer
+    parser_classes = [MultiPartParser, FormParser]  # Allows multipart form data (files + form data)
     partial = True
     
     

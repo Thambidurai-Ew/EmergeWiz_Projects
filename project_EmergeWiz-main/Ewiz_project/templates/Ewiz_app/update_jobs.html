@@ -38,7 +38,7 @@
             <div class="col border bg-white rounded mt-2 ms-xll-4 mb-2 px-xll-4">
 
                 <div class="row m-0 p-0">
-                    <form id="login-form" class="pe-lg-4" action="" method="post">
+                    <form id="login-form" class="pe-lg-4" enctype="multipart/form-data" action="" method="post">
                         {% csrf_token %}
                         <div class="col-12 mt-4 position-relative">
                             <h5 class="fw-bold">Update Jobs</h5>
@@ -106,6 +106,30 @@
                                             {{errors.Job_Openings}}
                                         {% endif %}
                                     </span>
+                                </div>
+                            </div>
+
+                            <!-- Logo -->
+                            <div class="col-12 col-md-6 pe-md-0">
+                                <div class="user-input-wrp me-md-2">
+
+                                    <!-- Logo field -->
+                                    <input type="file" name="logo" accept="image/*" id="logo" class="form-control">
+                                    <!-- <label class="floating-label">&nbsp;Logo&nbsp;</label> -->
+                                    <span id="Logo_error" class="error-div">
+                                        {% if errors.logo %}
+                                            {{ errors.logo }}
+                                        {% endif %}
+                                    </span>
+
+                                    <!-- Display current logo if it exists -->
+                                    {% if data.logo %}
+                                        <img src="{{ data.logo.url }}" alt="Logo" class="img-thumbnail mb-3" style="max-height: 150px;">
+                                    {% else %}
+                                        <p>No logo uploaded</p>
+                                    {% endif %}
+                                    
+                                    
                                 </div>
                             </div>
 

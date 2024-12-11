@@ -20,8 +20,10 @@
             <a href="javascript:void(0)" class="dropbtn">
                 <span class="profile">User Name</span> 
                 <p class="admin-p">
-                    {% if user.is_authenticated %}
+                    {% if user %}
                         {{ user.username }}
+                    {% else %}
+                        Guest
                     {% endif %}
                 </p>
                 <span class="down-arrow">{% bs_icon 'chevron-down' %}</span>

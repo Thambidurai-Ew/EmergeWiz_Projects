@@ -38,7 +38,7 @@
             <div class="col border bg-white rounded mt-2 ms-xll-4 mb-2 px-xll-4">
 
                 <div class="row m-0 p-0">
-                    <form id="login-form" class="pe-lg-4" action="" method="post">
+                    <form id="login-form" class="pe-lg-4" action="" enctype="multipart/form-data" method="post">
                         {% csrf_token %}
                         <div class="col-12 mt-4 position-relative">
                             <h5 class="fw-bold">Add Jobs</h5>
@@ -110,7 +110,7 @@
                             </div>
 
                             <!-- Job Openings -->
-                            <div class="col-12 col-md-6 pe-md-0">
+                            <div class="col-12 col-md-6">
                                 <div class="user-input-wrp me-md-2">
                                     <input type="text" name="Job_Openings" id="Job_Openings" class="form-control"
                                         placeholder=" " autocomplete="off" autofocus>
@@ -118,6 +118,20 @@
                                     <span id="Job_Openings_error" class="error-div">
                                         {% if errors.Job_Openings %}
                                             {{errors.Job_Openings}}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Logo -->
+                            <div class="col-12 col-md-6 pe-md-0">
+                                <div class="user-input-wrp me-md-2">
+                                    <input type="file" name="logo" accept="image/*" id="Logo" class="form-control"
+                                        placeholder=" " autocomplete="off" autofocus>
+                                    <label class="floating-label">&nbsp;Logo&nbsp;</label>
+                                    <span id="Logo_error" class="error-div">
+                                        {% if errors.logo %}
+                                            {{errors.logo}}
                                         {% endif %}
                                     </span>
                                 </div>
@@ -136,7 +150,7 @@
                             </div>
 
                             <!-- Key Skills -->
-                            <div id="key-skills-container">
+                            <!-- <div id="key-skills-container">
                                 <div class="col-12 col-md-6 pe-md-0" id="key-skills-field">
                                     <div class="user-input-wrp me-md-2">
                                         <input type="text" name="key_Skills[]" id="key_Skills" class="form-control"
@@ -149,13 +163,28 @@
                                         </span>
                                     </div>
                                 </div>
+                            </div> -->
+
+                            <!-- Key Skills -->
+                            <div id="key-skills-container">
+                                
+                                <!-- Empty field for adding new skills -->
+                                <div class="key-skill-item row mb-2">
+                                    <div class="col-10">
+                                        <input type="text" name="key_Skills[]" class="form-control" placeholder="Key Skill">
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-danger remove-skill">Remove</button>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-skill" class="btn btn-primary mt-2">Add Skill</button>
                             </div>
                             
                             
                         </div>
                         <!-- Buttons to Add/Remove -->
-                        <div class="p-2 bg-success text-white add-btn" id="add-field-btn" onclick="addKeySkillsField()">+</div>
-                        <div class="p-2 bg-danger text-white rm-btn" id="remove-field-btn" onclick="removeKeySkillsField()">-</div>
+                        <!-- <div class="p-2 bg-success text-white add-btn" id="add-field-btn" onclick="addKeySkillsField()">+</div>
+                        <div class="p-2 bg-danger text-white rm-btn" id="remove-field-btn" onclick="removeKeySkillsField()">-</div> -->
 
                         <div class="row d-flex justify-content-between my-3">
                             <div class="col-6 d-flex justify-content-md-end p-0 pe-4 pe-lg-4">
@@ -293,34 +322,66 @@
 
     document.addEventListener('DOMContentLoaded', () => showMessage());
 
-    function addKeySkillsField() {
-        // Find the container
-        const container = document.getElementById('key-skills-container');
+    // function addKeySkillsField() {
+    //     // Find the container
+    //     const container = document.getElementById('key-skills-container');
 
-        // Create a new div for the field
-        const newField = document.createElement('div');
-        newField.classList.add('col-12', 'col-md-6', 'pe-md-0');
-        newField.innerHTML = `
-            <div class="user-input-wrp me-md-2">
-                <input type="text" name="key_Skills[]" class="form-control" placeholder=" " autocomplete="off">
-                <label class="floating-label">&nbsp;Key Skills&nbsp;</label>
-                <span class="error-div"></span>
-            </div>
-        `;
+    //     // Create a new div for the field
+    //     const newField = document.createElement('div');
+    //     newField.classList.add('col-12', 'col-md-6', 'pe-md-0');
+    //     newField.innerHTML = `
+    //         <div class="user-input-wrp me-md-2">
+    //             <input type="text" name="key_Skills[]" class="form-control" placeholder=" " autocomplete="off">
+    //             <label class="floating-label">&nbsp;Key Skills&nbsp;</label>
+    //             <span class="error-div"></span>
+    //         </div>
+    //     `;
 
-        // Append the new field to the container
-        container.appendChild(newField);
-    }
+    //     // Append the new field to the container
+    //     container.appendChild(newField);
+    // }
 
-    function removeKeySkillsField() {
-        // Find the container
-        const container = document.getElementById('key-skills-container');
+    // function removeKeySkillsField() {
+    //     // Find the container
+    //     const container = document.getElementById('key-skills-container');
 
-        // Remove the last field, if any
-        if (container.lastElementChild && container.childElementCount > 1) {
-            container.removeChild(container.lastElementChild);
-        }
-    }
+    //     // Remove the last field, if any
+    //     if (container.lastElementChild && container.childElementCount > 1) {
+    //         container.removeChild(container.lastElementChild);
+    //     }
+    // }
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const skillsContainer = document.getElementById("key-skills-container");
+        const addSkillButton = document.getElementById("add-skill");
+
+        // Function to add a new skill input
+        addSkillButton.addEventListener("click", function () {
+            const skillItem = document.createElement("div");
+            skillItem.classList.add("key-skill-item", "row", "mb-2");
+            skillItem.innerHTML = `
+                <div class="col-10">
+                    <input type="text" name="key_Skills[]" class="form-control" placeholder="Key Skill">
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-danger remove-skill">Remove</button>
+                </div>
+            `;
+            skillsContainer.insertBefore(skillItem, addSkillButton);
+
+            // Attach event listener to the remove button of the new field
+            skillItem.querySelector(".remove-skill").addEventListener("click", function () {
+                skillItem.remove();
+            });
+        });
+
+        // Event delegation for removing skill items
+        skillsContainer.addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-skill")) {
+                const skillItem = event.target.closest(".key-skill-item");
+                skillItem.remove();
+            }
+        });
+    });
 </script>
 {% endblock %}
